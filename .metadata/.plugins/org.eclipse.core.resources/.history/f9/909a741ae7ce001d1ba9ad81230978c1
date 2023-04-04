@@ -1,0 +1,27 @@
+package demo.lambda1;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+/**
+ * 
+ * Hello world!
+ *
+ */
+public class WelcomeLambda implements RequestHandler<Integer, Integer> {
+
+	public Integer handleRequest(Integer input, Context context) {
+		int a = 0, b = 1, c;
+		if (input == 0) {
+			return a;
+		} 
+	for (int i = 1; i <= input; i++) {
+		c = a + b;
+		a = b;
+		b = c;
+	}
+	System.out.println("Number is: " + b);
+	return b;
+	}
+
+}

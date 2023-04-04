@@ -1,0 +1,72 @@
+package Database;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.amazonaws.services.lambda.runtime.Context;
+
+public class DeleteAccount {
+	
+	private static String DB_URL = "jdbc:mariadb://crmviet.c09wjkmeasrs.ap-southeast-1.rds.amazonaws.com:3306/crmviet_system";
+	private static String USER_NAME = "crmviet";
+	private static String PASSWORD = "altalab123";
+
+	public String handleRequest(String input, Context context) {
+		Connection conn=null;
+		try {
+			 conn = setConnection(DB_URL, USER_NAME, PASSWORD);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return selectDb(conn);
+	}
+
+	private static Connection setConnection(String url, String user, String pass) throws Exception {
+		Class.forName("org.mariadb.jdbc.Driver");
+		try {
+			Connection connection = DriverManager.getConnection(url, user, pass);
+			return connection;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public String selectDb(Connection conn) {
+		String content = "";
+		try {
+			PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM sys_accounts where DATABASE_ID = 3;");
+			ResultSet rs = preparedStatement.executeQuery();
+			while(rs.next()) {
+				System.out.println(rs.getString("ACCOUNT_NAME"));
+			}
+			conn.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return content;
+	}
+	
+	
+	public static String callProcedure(Connection conn) {
+		try {
+		CallableStatement demo=conn.prepareCall("{CALL lead_count('d1cc9878-59d0-11ed-b6e4-0244d1d782a0','aafa1cfc-8a3d-11e8-ae72-028ff1f3e03a',NULL,NULL,NULL,NULL,'is',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)}");
+			
+			ResultSet rs = demo.executeQuery();
+			while (rs.next()) {
+				System.out.println("thành công");
+			}
+			conn.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+
+	}
+
+}

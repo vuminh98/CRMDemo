@@ -1,0 +1,77 @@
+package Database.DatabaseDemo;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class DatabaseUtil {
+
+	private static final String endPoint = System.getenv("endPoint"); 
+	private static final String port = System.getenv("port");
+	
+    private static final String CRM_DB_URL = "jdbc:mysql://" + endPoint +":"+ port + "/" + System.getenv("dbSystem");
+    private static final String CRM_DB_USERNAME = System.getenv("user");
+    private static final String CRM_DB_PASSWORD = System.getenv("pass");
+    
+    private static final String ACCOUNT_DB_URL_PREFIX = "jdbc:mysql://" + endPoint + ":" + port + "/";
+    private static final String ACCOUNT_DB_USERNAME = System.getenv("user");
+    private static final String ACCOUNT_DB_PASSWORD = System.getenv("pass");
+
+    public static final Map<String, Connection> connectionMap = new HashMap<>();
+    public static final Map<String, String> accountDbInfo = new HashMap<>(); 
+    
+    public static Connection systemConnection;
+    
+    static {
+    	try {
+    		systemConnection = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+			
+			String sql = "SELECT FIRST_NAME, LAST_NAME FROM crm_lead";
+			Statement stmt = systemConnection.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+                String dbName = rs.getString("FIRST_NAME");
+                String databaseId = rs.getString("LAST_NAME");
+                String accountDBUrl = ACCOUNT_DB_URL_PREFIX + dbName; 
+                
+                Connection accountConnection = setConnection(accountDBUrl, ACCOUNT_DB_USERNAME, ACCOUNT_DB_PASSWORD);
+                connectionMap.put(databaseId, accountConnection); 
+			}
+			
+		} catch (Exception e) {
+			System.out.println("Exception handling set connection" + e.getMessage());
+			e.printStackTrace();
+		} 
+    } 
+    
+    
+    private static Connection setConnection (String url, String user, String pass) throws Exception {
+    	Class.forName("org.mysql.jdbc.Driver");
+    	try {
+			Connection connection = DriverManager.getConnection(url, user, pass);
+			return connection; 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+}

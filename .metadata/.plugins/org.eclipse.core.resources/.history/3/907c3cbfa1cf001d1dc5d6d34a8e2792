@@ -1,0 +1,5 @@
+package Database.DatabaseDemo;
+
+
+public class GetValueFromDB {
+}

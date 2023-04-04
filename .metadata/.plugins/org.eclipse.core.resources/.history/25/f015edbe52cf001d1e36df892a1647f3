@@ -1,0 +1,14 @@
+package demo.lambda1;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class WelcomeLambdaTest2 {
+
+	@Test
+	public void testHandleRequest() {
+		fail("Not yet implemented");
+	}
+
+}

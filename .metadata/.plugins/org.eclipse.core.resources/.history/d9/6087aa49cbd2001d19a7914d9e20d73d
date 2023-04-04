@@ -1,0 +1,156 @@
+package Database.quotes;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDateTime;
+
+import org.json.JSONObject;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+public class AddQuote implements RequestHandler<String, String> {
+	private static final String endPoint = System.getenv("endPoint"); 
+	private static final String port = System.getenv("port");
+	
+    private static final String CRM_DB_URL = "jdbc:mariadb://" + endPoint +":"+ port + "/" + System.getenv("dbSystem");
+    private static final String CRM_DB_USERNAME = System.getenv("user");
+    private static final String CRM_DB_PASSWORD = System.getenv("pass");
+    
+    private static final String ACCOUNT_DB_URL_PREFIX = "jdbc:mariadb://" + endPoint + ":" + port + "/";
+    private static final String ACCOUNT_DB_USERNAME = System.getenv("user");
+    private static final String ACCOUNT_DB_PASSWORD = System.getenv("pass");
+    
+    public static Connection systemConnection;
+    
+	private static Connection setConnection (String url, String user, String pass) throws Exception {
+    	Class.forName("org.mariadb.jdbc.Driver");
+    	try {
+			Connection connection = DriverManager.getConnection(url, user, pass);
+			return connection; 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+	
+
+	@Override
+	public String handleRequest(String input, Context context) {
+		Connection connection = null;
+		System.out.println(input);
+		try {
+			connection = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+			String sql = "SELECT DATABASE_ID FROM sys_accounts WHERE account_id = '" + input + "'";
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				int dbId = rs.getInt("DATABASE_ID");
+				System.out.println(dbId);
+				String sqlString = "SELECT d.DATABASE FROM sys_databases d where d.database_id ="+ dbId;
+				Statement statement = connection.createStatement();
+				ResultSet rSet = statement.executeQuery(sqlString);
+				while(rSet.next()) {
+					String dbAccount = rSet.getString("DATABASE");
+					System.out.println(dbAccount);
+					connection = setConnection(ACCOUNT_DB_URL_PREFIX + dbAccount, ACCOUNT_DB_USERNAME, ACCOUNT_DB_PASSWORD);
+					String SQLADD = "UPDATE crm_email_list set EMAIL_LIST_NAME = 'sadsadasd', EMAILS = 'ashdsa1213@gmail.com', NOTE= 'asdasd' where ACCOUNT_ID='"+input +"'"; 
+					 
+					Statement statement2 = connection.createStatement();
+					ResultSet resultSet = statement2.executeQuery(SQLADD);
+					System.out.println("ADD SUCCESSFULLY!");
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	
+
+	
+	
+
+//	@Override
+//	public String handleRequest(String jsonString, Context context) {
+//		Connection conn = null;
+//		JSONObject input = new JSONObject(jsonString);
+//		System.out.println(input.toString());
+//		String sql_String = "";
+//		String mess = "";
+//		try {
+//			conn = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+//			sql_String = "INSERT INTO crm_quote(ACCOUNT_ID,OWNER_ID, CUSTOMER_ID,CONTACT_ID, "
+//					+ "DEAL_ID, QUOTE_CODE, QUOTE_DATE ,REG_USER, UPD_USER,REG_DTTM, UPD_DTTM, PRODUCT_AMOUNT, "
+//					+ "WARRANTY, EXCHANGE_RATE, PRODUCT_STATUS, TIME_DELIVERY, ADDRESS_DELIVERY, PAYMENT_PERIOD,"
+//					+ "PAYMENT_METHOD,PAYMENT_FORM, STAGE, NOTE, TAX_AMOUNT, DISCOUNT_AMOUNT, SHIPPING_CHARGE, ADDRESS_BILL, "
+//					+ "TERM_CONDITION, TRANSPORT, VALID_UNTIL )"
+//					+ "VALUES ("+ input.get("ACCOUNT_ID") + "," + input.get("OWNER_ID") + "," + input.getInt("CUSTOMER_ID") + ","
+//					+ input.getInt("CONTACT_ID") + "," + input.get("DEAL_ID") + "," + input.get("QUOTE_CODE") + "," + input.get("QUOTE_DATE")
+//					+ input.get("REG_USER") + "," + input.get("UPD_USER") + "," + input.get("REG_DTTM") + ","
+//					+ input.get("UPD_DTTM") + "," + input.getDouble("PRODUCT_AMOUNT") + "," + input.get("WARRANTY") + ","
+//					+ input.get("EXCHANGE_RATE") + "," + input.get("PRODUCT_STATUS") + "," + input.get("TIME_DELIVERY") + ","
+//					+ input.get("ADDRESS_DELIVERY") + "," + input.get("PAYMENT_PERIOD") + "," + input.get("PAYMENT_METHOD") + ","
+//					+ input.get("PAYMENT_FORM") + "," + "Duoc tao" + "," + input.get("NOTE") + ","
+//					+ 0 + "," + 0 + "," + 0 + ","
+//					+ input.get("ADDRESS_BILL") + "," + input.get("TERM_CONDITION") + "," + input.get("TRANSPORT") + ","
+//					+ input.get("VALID_UNTIL");
+//			mess = "Create Success";
+//			System.out.println("Query_SQL= " + sql_String);
+//			Statement stmt = conn.createStatement();
+//			ResultSet rs = stmt.executeQuery(sql_String);
+//			System.out.println("Result: " + rs);
+//			System.out.println("Message: " + mess);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return mess;
+//	}
+	
+	
+	
+//	@Override
+//	public String handleRequest1(String jsonString, Context context) {
+//		Connection conn = null;
+//		JSONObject input = new JSONObject(jsonString);
+//		System.out.println(input.toString());
+//		String sql_String = "";
+//		String mess = "";
+//		try {
+//			conn = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+//			sql_String = "INSERT INTO crm_quote set ACCOUNT_ID='" +  input.get("ACCOUNT_ID") 
+//			+ "', OWNER_ID='" + input.get("OWNER_ID") 
+//			+ "', CUSTOMER_ID='" + input.get("CUSTOMER_ID")
+//			+ "' CONTACT_ID='" + input.get("CONTACT_ID")
+//			+ "' DEAL_ID='" + input.get("DEAL_ID")
+//			+ "' QUOTE_CODE='" + input.get("QUOTE_CODE")
+//			+ "' QUOTE_DATE='" + input.get("QUOTE_DATE")
+//			+ "' REG_USER='" + input.get("REG_USER")
+//			+ "' UPD_USER='" + input.get("UPD_USER")
+//			+ "' REG_DTTM='" + input.get("REG_DTTM")
+//			+ "' UPD_DTTM='" + input.get("UPD_DTTM")
+//			+ "' PRODUCT_AMOUNT='" + input.get("PRODUCT_AMOUNT")
+//			+ "' WARRANTY='" + input.get("WARRANTY")
+//			+ "' EXCHANGE_RATE='" + input.get("EXCHANGE_RATE")
+//			+ "' PRODUCT_STATUS='" + input.get("PRODUCT_STATUS");
+//					
+//			mess = "Create Success";
+//			System.out.println("Query_SQL= " + sql_String);
+//			Statement stmt = conn.createStatement();
+//			ResultSet rs = stmt.executeQuery(sql_String);
+//			System.out.println("Result: " + rs);
+//			System.out.println("Message: " + mess);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return mess;
+//	}
+	
+
+}

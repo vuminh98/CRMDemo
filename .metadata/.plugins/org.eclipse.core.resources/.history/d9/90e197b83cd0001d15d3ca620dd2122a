@@ -1,0 +1,232 @@
+package Database.DatabaseDemo;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class DatabaseUtil {
+
+	private static final String endPoint = System.getenv("endPoint"); 
+	private static final String port = System.getenv("port");
+	
+    private static final String CRM_DB_URL = "jdbc:mysql://" + endPoint +":"+ port + "/" + System.getenv("dbSystem");
+    private static final String CRM_DB_USERNAME = System.getenv("user");
+    private static final String CRM_DB_PASSWORD = System.getenv("pass");
+    
+    private static final String ACCOUNT_DB_URL_PREFIX = "jdbc:mysql://" + endPoint + ":" + port + "/";
+    private static final String ACCOUNT_DB_USERNAME = System.getenv("user");
+    private static final String ACCOUNT_DB_PASSWORD = System.getenv("pass");
+
+    public static final Map<String, Connection> connectionMap = new HashMap<>();
+    public static final Map<String, String> accountDbInfo = new HashMap<>(); 
+    
+    public static Connection systemConnection;
+    
+    static {
+    	try {
+    		systemConnection = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+			
+			String sql = "SELECT d.database, d.database_id FROM sys_databases d";
+			Statement stmt = systemConnection.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+                String dbName = rs.getString("database");
+                String databaseId = rs.getString("database_id");
+                String accountDBUrl = ACCOUNT_DB_URL_PREFIX + dbName; 
+                
+                Connection accountConnection = setConnection(accountDBUrl, ACCOUNT_DB_USERNAME, ACCOUNT_DB_PASSWORD);
+                connectionMap.put(databaseId, accountConnection); 
+			}
+			
+		} catch (Exception e) {
+			System.out.println("Exception handling set connection" + e.getMessage());
+			e.printStackTrace();
+		} 
+    } 
+    
+    
+    private static Connection setConnection (String url, String user, String pass) throws Exception {
+    	Class.forName("org.mariadb.jdbc.Driver");
+    	try {
+			Connection connection = DriverManager.getConnection(url, user, pass);
+			return connection; 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+    public static Connection setAccountConnection (String accountId, Connection systemConnection) throws Exception {
+    	if (accountDbInfo.get(accountId) != null) {
+    		System.out.println("Account id in Map");
+			Connection accountDbConnection = connectionMap.get(accountDbInfo.get(accountId)); 
+			if (accountDbConnection != null && !accountDbConnection.isClosed() ) {
+				return accountDbConnection;
+			}
+		}
+    	
+    	String sql = "SELECT sd.database, sd.database_id FROM sys_accounts JOIN sys_databases sd USING (database_id) WHERE account_id = '" + accountId + "'";
+    	if (systemConnection == null || systemConnection.isClosed()) {
+    		systemConnection = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+    	}
+    	
+		Statement stmt = systemConnection.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		if (rs.next()) {
+			String databaseName = rs.getString(1);
+			String databaseId = rs.getString(2); 
+		    try {
+		    	if (connectionMap.get(databaseId) != null && !connectionMap.get(databaseId).isClosed() ) {
+		    		System.out.println("Connection get from Map:" + connectionMap.get(databaseId).toString());
+		    		return connectionMap.get(databaseId);
+		    	}
+		    		
+				Connection dbConnection = setConnection(ACCOUNT_DB_URL_PREFIX + databaseName, ACCOUNT_DB_USERNAME, ACCOUNT_DB_PASSWORD);
+				accountDbInfo.put(accountId, databaseId); 
+				connectionMap.put(databaseId, dbConnection); 
+				return dbConnection;
+			} catch (Exception e) {
+				System.out.println("No connection found for accountId: " + accountId);
+				e.printStackTrace();
+			} 
+		}
+    	return null; 
+    }
+    
+    public static Connection checkAccountConnection (String accountId, Connection systemConnection, Map<String, Connection> connectionMap) throws Exception {
+    	String sql = "SELECT sd.database_id FROM sys_accounts JOIN sys_databases sd USING (database_id) WHERE account_id = '" + accountId + "'";
+    	if (systemConnection == null || systemConnection.isClosed()) {
+    		systemConnection = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+    	}
+		Statement stmt = systemConnection.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		if (rs.next()) {
+			String databaseId = rs.getString(1); 
+			Connection accountConnection = connectionMap.get(databaseId); 
+			if (accountConnection != null && !accountConnection.isClosed()) {
+				return accountConnection;
+			}
+		}
+    	return null;
+    	
+    }
+
+    public void closeConnection(Connection conn) throws SQLException {
+        conn.close();
+    }
+    
+    public static List getResultFromDatabase(ResultSet rs) throws SQLException {
+        ResultSetMetaData metadata = rs.getMetaData();
+        int numColumns = metadata.getColumnCount();
+        List list = new ArrayList<>(); 
+        
+        while (rs.next()) {
+            Map<String, Object> map = new HashMap<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            for (int i = 1; i <= numColumns; i++) {
+                String columnName = metadata.getColumnLabel(i);
+                Object columnValue = rs.getObject(i);
+                
+                if (columnValue instanceof java.util.Date) {
+                	java.sql.Timestamp timestamp = (java.sql.Timestamp) columnValue;
+                    LocalDateTime localDateTime = timestamp.toLocalDateTime();
+                    ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+                    String formattedDate = zonedDateTime.format(formatter);
+					
+					map.put(columnName, formattedDate); 
+					
+                }
+                else {
+            	  map.put(columnName, columnValue);
+                }
+            }
+            list.add(map);
+            System.out.println("Result: " + map.toString());
+        }
+        rs.close();
+		return list;
+    }
+    
+    public static List executeDatabaseStore (Connection accountConnection, String procedureName, String mapping, Object... params) throws SQLException, ParseException {
+    	String call = "{ CALL " + procedureName + "(" + String.join(",", Collections.nCopies(params.length, "?")) + ") }";
+    	CallableStatement statement = accountConnection.prepareCall(call);
+    	
+    	for (int i=0; i< params.length; i++) {
+        	Object param = params[i]; 
+        	char c = mapping.charAt(i);
+        	int type = 0;
+        	
+        	if (param == null || param.toString().trim().isEmpty()) {
+        		switch (c) {
+	        		case 's': 
+	        			type = Types.VARCHAR;
+	        			break; 
+	        		case 'i': 
+	        			type = Types.INTEGER;
+	        			break; 
+	        		case 'd': 
+	        			type = Types.DATE;
+	        			break; 
+	        		case 't': 
+	        			type = Types.TIMESTAMP;
+	        			break; 
+	        		case 'f': 
+	        			type = Types.DOUBLE;
+	        			break; 
+        		}
+				statement.setNull(i + 1, type);
+			} else {
+				switch (c) {
+	                case 's':
+	                    statement.setString(i + 1, param.toString().trim());
+	                    break;
+	                case 'i':
+	                    statement.setInt(i + 1, Integer.valueOf(param.toString()) );
+	                    break;
+	                case 'd':
+	                	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						java.util.Date date = formatter.parse(param.toString());
+						LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+						statement.setDate(i + 1, java.sql.Date.valueOf(localDate));
+	                    break;
+	                case 'f':
+	                	statement.setDouble(i + 1, Double.valueOf(param.toString().trim()));
+	                    break;
+	                case 't':
+	                	DateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						java.util.Date date1 = formatter1.parse(param.toString());
+						statement.setTimestamp(i + 1, new java.sql.Timestamp(date1.getTime()));
+	                    break;
+	                default:
+	                    throw new SQLException("Invalid parameter mapping character: " + param);
+				}
+			}
+        }
+    	
+    	System.out.println("Set param successFully");
+        ResultSet rs;
+		rs = statement.executeQuery();
+        System.out.println("Statement execute sucessfully");
+        List list = getResultFromDatabase(rs); 
+        statement.close();
+    	return list; 
+    }
+}

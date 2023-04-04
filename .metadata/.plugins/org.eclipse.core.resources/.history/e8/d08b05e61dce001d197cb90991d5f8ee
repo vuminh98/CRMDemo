@@ -1,0 +1,202 @@
+package altalab.altacrm.action;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.faces.context.FacesContext;
+
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.framework.EntityHome;
+
+import altalab.altacrm.consts.CommonValueConsts;
+import altalab.altacrm.model.CompanyInfo;
+import altalab.altacrm.model.Parameters;
+import altalab.altacrm.model.TblUsers;
+
+@Name("aboutUsHome")
+@AutoCreate
+@Scope(ScopeType.CONVERSATION)
+public class AboutUsHome extends EntityHome<CompanyInfo>{
+
+	private static final long serialVersionUID = 1L;
+
+	public void setCompanyInfoId(Integer id){
+		setId(id);
+	}
+	
+	public Integer getCompanyInfoId(){
+		return (Integer)getId();
+	}
+	
+	Locale locale = (Locale) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("localeSession");
+    TblUsers sesssionUser = (TblUsers) FacesContext.getCurrentInstance().getExternalContext()
+                           .getSessionMap().get(CommonValueConsts.CURRENT_USER_SESSION_NAME);
+    
+    private String version = "2.5.1.1";
+	private String buildTime = "14/03/2022";
+    
+	private String content;
+	private String name;
+	private String telephone;
+	private String email;
+
+	public void preSendReport(){
+		name = sesssionUser.getUserFullName();
+		email = sesssionUser.getUserEmail();
+		telephone = sesssionUser.getUserMobile();
+		content = "";
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String sendReport(){
+		ResourceBundle rbCommon = ResourceBundle.getBundle("messages_common", locale);
+		if(content == null || content.trim().equals("")){			
+			addFacesMessageFromResourceBundle(rbCommon.getString("error_content_empty"), "");
+			return "";
+		}
+		if(name == null || name.trim().equals("")){			
+			addFacesMessageFromResourceBundle(rbCommon.getString("error_name_empty"), "");
+			return "";
+		}		
+		if(telephone == null || telephone.trim().equals("")){			
+			addFacesMessageFromResourceBundle(rbCommon.getString("error_telephone_empty"), "");
+			return "";
+		}
+		if(email == null || email.trim().equals("")){			
+			addFacesMessageFromResourceBundle(rbCommon.getString("error_email_empty"), "");
+			return "";
+		}
+		String company = "";
+		String contractCode = "";
+		List<CompanyInfo> listCompany = getEntityManager().createQuery("from CompanyInfo").getResultList();
+		if(listCompany.size() > 0){
+			company = listCompany.get(0).getCompanyName() == null ? "" : listCompany.get(0).getCompanyName();
+		}
+		List<Parameters> listParam = getEntityManager().createQuery("from Parameters").getResultList();
+		if(listParam.size() > 0){
+			contractCode = listParam.get(0).getContractCode();
+		}
+		
+		try{
+			//Send request
+			String input = "contract="+contractCode + "&name=" + name 
+			              + "&telephone=" + telephone + "&email="+ email
+			              + "&company=" + company + "&content=" + content
+			              + "&version="+ version ;
+			URL url = new URL(CommonValueConsts.CRMVIET_TICKET);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Content-Length", "" + input.length());
+
+			DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(wr, "UTF-8"));
+			writer.write(input);
+			writer.close();
+			wr.close();
+			
+	        //Receive respone
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+			StringBuffer output = new StringBuffer();
+			String line = "";
+			while ((line = br.readLine()) != null) {
+				output.append(line);
+			}
+			//In du lieu
+			System.out.println(output.toString());
+	
+			conn.disconnect();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+		addFacesMessageFromResourceBundle(rbCommon.getString("send_successful"), "");
+		return "success";
+	}
+	
+	/**
+	 * @return the content
+	 */
+	public String getContent() {
+		return content;
+	}
+
+	/**
+	 * @param content the content to set
+	 */
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the telephone
+	 */
+	public String getTelephone() {
+		return telephone;
+	}
+
+	/**
+	 * @param telephone the telephone to set
+	 */
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * @param email the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setBuildTime(String buildTime) {
+		this.buildTime = buildTime;
+	}
+
+	public String getBuildTime() {
+		return buildTime;
+	}
+
+
+}

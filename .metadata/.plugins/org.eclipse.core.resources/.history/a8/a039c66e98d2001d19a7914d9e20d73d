@@ -1,0 +1,72 @@
+package Database.quotes;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+public class Login implements RequestHandler<String, String> {
+	
+	
+	
+	private static final String endPoint = System.getenv("endPoint"); 
+	private static final String port = System.getenv("port");
+	
+    private static final String CRM_DB_URL = "jdbc:mariadb://" + endPoint +":"+ port + "/" + System.getenv("dbSystem");
+    private static final String CRM_DB_USERNAME = System.getenv("user");
+    private static final String CRM_DB_PASSWORD = System.getenv("pass");
+    
+    private static final String ACCOUNT_DB_URL_PREFIX = "jdbc:mariadb://" + endPoint + ":" + port + "/";
+    private static final String ACCOUNT_DB_USERNAME = System.getenv("user");
+    private static final String ACCOUNT_DB_PASSWORD = System.getenv("pass");
+
+    public static final Map<String, Connection> connectionMap = new HashMap<>(); // cặp key-value là String - Connection
+    public static final Map<String, String> accountDbInfo = new HashMap<>(); // cặp key-value là String - String 
+    
+    public static Connection systemConnection;
+	
+	
+	private static Connection setConnection (String url, String user, String pass) throws Exception {
+    	Class.forName("org.mariadb.jdbc.Driver");
+    	try {
+			Connection connection = DriverManager.getConnection(url, user, pass);
+			return connection; 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+	
+
+	
+	@Override
+	public String handleRequest(String input, Context context) {
+		try {
+    		systemConnection = setConnection(CRM_DB_URL, CRM_DB_USERNAME, CRM_DB_PASSWORD);
+			String sql = "SELECT d.database, d.database_id FROM sys_databases d"; // dbSystem = crmviet_sharding_02
+			Statement stmt = systemConnection.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+                String dbName = rs.getString("database");
+                String databaseId = rs.getString("database_id");
+                String accountDBUrl = ACCOUNT_DB_URL_PREFIX + dbName; 
+                
+                Connection accountConnection = setConnection(accountDBUrl, ACCOUNT_DB_USERNAME, ACCOUNT_DB_PASSWORD);
+                connectionMap.put(databaseId, accountConnection); 
+                System.out.println(connectionMap.get(databaseId).toString());
+			}
+			
+		} catch (Exception e) {
+			System.out.println("Exception handling set connection" + e.getMessage());
+			e.printStackTrace();
+		} 
+		return "abc";
+	}
+	
+}

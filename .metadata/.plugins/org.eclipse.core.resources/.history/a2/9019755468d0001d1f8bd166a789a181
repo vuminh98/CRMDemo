@@ -1,0 +1,14 @@
+package Database.DatabaseDemo;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class GetValueFromDBTest {
+
+	@Test
+	public void test() {
+		
+	}
+
+}

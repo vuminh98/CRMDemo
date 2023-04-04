@@ -1,0 +1,14 @@
+package demo.lambda1;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class WelcomeLambdaTest3 {
+
+	@Test
+	public void testFindFibonacciPosition() {
+		fail("Not yet implemented");
+	}
+
+}

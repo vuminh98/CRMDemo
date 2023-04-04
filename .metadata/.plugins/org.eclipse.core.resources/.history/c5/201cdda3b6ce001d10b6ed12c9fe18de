@@ -1,0 +1,31 @@
+package altalab.altacrm.modeltest;
+
+import com.amazonaws.Request;
+import com.amazonaws.handlers.RequestHandler;
+import com.amazonaws.util.TimingInfo;
+
+public class HelloWorld implements RequestHandler{
+	public static void main(String[] args) {
+		System.out.println("Hello World");
+	}
+
+	@Override
+	public void afterError(Request<?> arg0, Exception arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void afterResponse(Request<?> arg0, Object arg1, TimingInfo arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void beforeRequest(Request<?> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+}

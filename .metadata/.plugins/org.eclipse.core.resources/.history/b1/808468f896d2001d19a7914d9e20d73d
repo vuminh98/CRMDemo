@@ -1,0 +1,5 @@
+package Database.quotes;
+
+public class Login {
+
+}

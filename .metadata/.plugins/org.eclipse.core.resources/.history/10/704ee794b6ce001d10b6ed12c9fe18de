@@ -1,0 +1,11 @@
+package altalab.altacrm.modeltest;
+
+import com.amazonaws.handlers.RequestHandler;
+
+public abstract class HelloWorld implements RequestHandler{
+	public static void main(String[] args) {
+		System.out.println("Hello World");
+	}
+
+
+}

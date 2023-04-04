@@ -1,0 +1,34 @@
+package Database.DatabaseDemo;
+
+import java.util.List;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class GetValueFromDB {
+	List<String> expressionStrings = new ArrayList<String>();
+	
+	public List<String> handleRequest() {
+		String jdbcURL = "jdbc:mysql://crmviet.c09wjkmeasrs.ap-southeast-1.rds.amazonaws.com:3306/crmviet_sharding";
+		try(Connection connection = (Connection) DriverManager.getConnection(jdbcURL,"crmviet","altalab123")) {
+			if (!connection.isValid(0)) {
+				System.out.println("Unable to connect to: " + jdbcURL);
+				System.exit(0);
+			}
+			PreparedStatement sePreparedStatement = (PreparedStatement) connection.prepareStatement("select * from crm_lead");
+			ResultSet rSet  = sePreparedStatement.executeQuery();
+			while (rSet.next()) {
+				System.out.println(rSet.toString());
+				expressionStrings.add(rSet.toString());
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return expressionStrings;
+	}
+}

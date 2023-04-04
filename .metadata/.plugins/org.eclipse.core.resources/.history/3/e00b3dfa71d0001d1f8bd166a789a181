@@ -1,0 +1,55 @@
+package Database.GetValue;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+public class GetValue implements RequestHandler<String, String> {
+
+	private static String DB_URL = "jdbc:mariadb://crmviet.c09wjkmeasrs.ap-southeast-1.rds.amazonaws.com:3306/crmviet_sharding";
+	private static String USER_NAME = "crmviet";
+	private static String PASSWORD = "altalab123";
+
+	public String handleRequest(String input, Context context) {
+		Connection conn=null;
+		try {
+			 conn = setConnection(DB_URL, USER_NAME, PASSWORD);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return selectDb(conn);
+	}
+
+	private static Connection setConnection(String url, String user, String pass) throws Exception {
+		Class.forName("org.mariadb.jdbc.Driver");
+		try {
+			Connection connection = DriverManager.getConnection(url, user, pass);
+			return connection;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public String selectDb(Connection conn) {
+		String content = "";
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT FIRST_NAME, LAST_NAME FROM crm_lead LIMIT 5;");
+			int count = 0;
+			while (rs.next()) {
+				content += (count++) + " - " + rs.getString(1) + " - " + rs.getString(2) + "\n";
+			}
+			conn.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return content;
+	}
+}

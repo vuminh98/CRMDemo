@@ -1,0 +1,1186 @@
+package altalab.altacrm.model;
+
+// Generated Nov 10, 2010 11:14:48 AM by Hibernate Tools 3.2.4.GA
+
+import static javax.persistence.GenerationType.IDENTITY;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.faces.context.FacesContext;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.hibernate.validator.Length;
+
+import altalab.altacrm.consts.CommonValueConsts;
+import altalab.altacrm.utils.FunctionsCommonUtils;
+
+@Entity
+@Table(name = "products")
+public class Products implements java.io.Serializable, Cloneable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Integer productId;
+	private String productCode;
+	private String productName;
+	private String productNameText; //search product name html
+	private String productUnit;
+	private String description;
+	private String productImage;
+	private String urlImage; // link anh online de get ve server
+	private Double priceIn;
+	private Double oldPriceIn;
+	private Double priceOut;
+	private Double oldPriceOut;
+	private Double tax;
+	private Integer status;//1 la hoat dong - 0 la ngung hoat dong
+	private Integer regUser;
+	private Integer updUser;
+	private Date regDate;
+	private Date updDate;
+	private String warrantyTime;
+	private Double productCogs; // gia von cua hang hoa
+	private String productOrigin; // xuat xu
+	private String productManufactory; // hang san xuat
+	private String serial;
+	private Double outOfStock;
+	private Double width;
+	private Double height;
+	private Double length;
+	
+	private String productCategory;
+	private Date expiryDate;
+	private Integer unitId; // don vi tinh chinh
+	private String formula; // cong thuc tinh
+	private String formulaDescription; // mo ta cong thuc tinh
+	private Double factorRevenue; //he so doanh thu bao cao tong hop bang hang theo mat hang
+	private Set<FilesProducts> filesProducts = new HashSet<FilesProducts>(0);
+	private Set<ProductUnit> productUnits = new HashSet<ProductUnit>(0);
+	private Set<Categories> categories = new HashSet<Categories>();
+	
+	@Column(name = "PRODUCT_CATEGORY")
+	public String getProductCategory() {
+		return productCategory;
+	}
+
+	public void setProductCategory(String productCategory) {
+		this.productCategory = productCategory;
+	}
+
+	private Set<ProductContract> productContract = new HashSet<ProductContract>(0);
+	private Set<ProductForecast> productForecast = new HashSet<ProductForecast>(0);
+	private Set<ProductTblBills> productBill = new HashSet<ProductTblBills>(0);
+
+	private Set<ProductComponents> product = new HashSet<ProductComponents>(0);
+	private Set<ProductComponents> productComponent = new HashSet<ProductComponents>(0);
+
+	private Set<ProductWarehouseProduct> productsWarehouseProduct = new HashSet<ProductWarehouseProduct>(0);
+	private Set<CustomersLevelProduct> customersLevelProduct = new HashSet<CustomersLevelProduct>(0);
+	
+	private Set<AttributeValue> attributeValues = new HashSet<AttributeValue>(0);
+
+	private String priceInString;
+	private String priceOutString;
+	private Map<Integer, String> customFields = new HashMap<Integer, String>();
+	
+	public Products() {
+
+	}
+
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "PRODUCT_ID", unique = true, nullable = false)
+	public Integer getProductId() {
+		return this.productId;
+	}
+
+	public void setProductId(Integer productId) {
+		this.productId = productId;
+	}
+
+	@Column(name = "PRODUCT_NAME", length = 65535)
+	@Length(max=65535)
+	public String getProductName() {
+		return this.productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+	
+	@Column(name = "PRODUCT_NAME_TEXT", length = 65535)
+	@Length(max=65535)
+	public String getProductNameText() {
+		return productNameText;
+	}
+
+	public void setProductNameText(String productNameText) {
+		this.productNameText = productNameText;
+	}
+
+	@Column(name = "PRODUCT_UNIT", length = 100)
+	public String getProductUnit() {
+		return this.productUnit;
+	}
+
+	public void setProductUnit(String productUnit) {
+		this.productUnit = productUnit;
+	}
+
+	@Column(name = "PRODUCT_DESCRIPTION", length = 65535)
+	@Length(max = 65535)
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@Column(name = "PRODUCT_IMAGE")
+	public String getProductImage() {
+		return productImage;
+	}
+
+	public void setProductImage(String productImage) {
+		this.productImage = productImage;
+	}
+
+	@Column(name = "STATUS")
+	public Integer getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	@Column(name = "REG_USER")
+	public Integer getRegUser() {
+		return this.regUser;
+	}
+
+	public void setRegUser(Integer regUser) {
+		this.regUser = regUser;
+	}
+
+	@Column(name = "UPD_USER")
+	public Integer getUpdUser() {
+		return this.updUser;
+	}
+
+	public void setUpdUser(Integer updUser) {
+		this.updUser = updUser;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "REG_DATE", length = 19)
+	public Date getRegDate() {
+		return this.regDate;
+	}
+
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "UPD_DATE", length = 19)
+	public Date getUpdDate() {
+		return this.updDate;
+	}
+
+	public void setUpdDate(Date updDate) {
+		this.updDate = updDate;
+	}
+
+	@Column(name = "PRODUCT_PRICE_IN")
+	public Double getPriceIn() {
+		if (priceInString != null && !"".equals(priceInString)) {
+			// String priceInTemp = priceInString.replaceAll(",", "");
+			// priceIn = new Double(priceInTemp);
+			try {
+				Locale locale = (Locale) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("localeSession");
+				NumberFormat nf = NumberFormat.getInstance(locale);
+				priceIn = nf.parse(priceInString).doubleValue();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return priceIn;
+	}
+
+	public void setPriceIn(Double priceIn) {
+		this.priceIn = priceIn;
+	}
+
+	@Column(name = "PRODUCT_PRICE")
+	public Double getPriceOut() {
+		if (priceOutString != null && !"".equals(priceOutString)) {
+			// String priceOutTemp = priceOutString.replaceAll(",", "");
+			// priceOut = new Double(priceOutTemp);
+			try {
+				Locale locale = (Locale) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("localeSession");
+				NumberFormat nf = NumberFormat.getInstance(locale);
+				priceOut = nf.parse(priceOutString).doubleValue();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return priceOut;
+	}
+
+	public void setPriceOut(Double priceOut) {
+		this.priceOut = priceOut;
+	}
+	
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy="products")
+	public Set<Categories> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Set<Categories> categories) {
+		this.categories = categories;
+	}
+
+	@Column(name = "PRODUCT_CODE")
+	public String getProductCode() {
+		return productCode;
+	}
+
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
+	}
+
+	@Column(name = "TAX")
+	public Double getTax() {
+		return tax;
+	}
+
+	public void setTax(Double tax) {
+		this.tax = tax;
+	}
+
+	@Column(name = "PRODUCT_COGS")
+	public Double getProductCogs() {
+		return productCogs;
+	}
+
+	public void setProductCogs(Double productCogs) {
+		this.productCogs = productCogs;
+	}
+
+	@Column(name = "PRODUCT_ORIGIN")
+	public String getProductOrigin() {
+		return productOrigin;
+	}
+
+	public void setProductOrigin(String productOrigin) {
+		this.productOrigin = productOrigin;
+	}
+
+	@Column(name = "PRODUCT_MANUFACTORY")
+	public String getProductManufactory() {
+		return productManufactory;
+	}
+
+	public void setProductManufactory(String productManufactory) {
+		this.productManufactory = productManufactory;
+	}
+
+	@Column(name = "SERIAL")
+	public String getSerial() {
+		return serial;
+	}
+
+	public void setSerial(String serial) {
+		this.serial = serial;
+	}
+
+	private Boolean selected = false;
+	private Double changePriceRate;
+
+	// ty le venh giua gia nhap va xuat
+	@Column(name = "CHANGE_PRICE_RATE")
+	public Double getChangePriceRate() {
+		return changePriceRate;
+	}
+
+	public void setChangePriceRate(Double changePriceRate) {
+		this.changePriceRate = changePriceRate;
+	}
+
+	@Transient
+	public Boolean getSelected() {
+		return selected;
+	}
+
+	public void setSelected(Boolean selected) {
+		this.selected = selected;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Products) {
+			Products g = (Products) obj;
+			if (g.getProductId() == null) {
+				return true;
+			} else if (g.getProductId().equals(this.productId))
+				return true;
+		}
+
+		return false;
+	}
+
+	@PrePersist
+	public void init() {
+		regUser = (Integer) FacesContext.getCurrentInstance()
+				.getExternalContext().getSessionMap().get(
+						CommonValueConsts.CURRENT_USER_ID_SESSION_NAME);
+		if(regDate == null) {
+			regDate = new Date();
+		}
+		updUser = regUser;
+		updDate =  regDate;
+		setStatus(CommonValueConsts.STATUS_ACTIVE);
+		
+		if(productCode != null) productCode = productCode.trim();
+		
+		if(productName != null) {
+			productName = FunctionsCommonUtils.compound2Unicode(productName.trim());
+		}
+		if(productNameText != null) {
+			productNameText = FunctionsCommonUtils.compound2Unicode(productNameText.trim());
+		}
+		if(description != null) {
+			description = FunctionsCommonUtils.compound2Unicode(description.trim());
+		}
+		if(formulaDescription != null) {
+			formulaDescription = FunctionsCommonUtils.compound2Unicode(formulaDescription.trim());
+		}
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		updUser = (Integer) FacesContext.getCurrentInstance()
+				.getExternalContext().getSessionMap().get(
+						CommonValueConsts.CURRENT_USER_ID_SESSION_NAME);
+		if(regDate == null) {
+			regDate = new Date();
+		}
+		updUser = regUser;
+		updDate =  regDate;
+		if(productCode != null) productCode = productCode.trim();
+		if(productName != null) {
+			productName = FunctionsCommonUtils.compound2Unicode(productName.trim());
+		}
+		if(productNameText != null) {
+			productNameText = FunctionsCommonUtils.compound2Unicode(productNameText.trim());
+		}
+		if(description != null) {
+			description = FunctionsCommonUtils.compound2Unicode(description.trim());
+		}
+		if(formulaDescription != null) {
+			formulaDescription = FunctionsCommonUtils.compound2Unicode(formulaDescription.trim());
+		}
+	}
+
+	private Double amountAfterTax;
+
+	@Transient
+	public Double getAmountAfterTax() {
+		amountAfterTax = 0D;
+		if (discount == null) {
+			discount = 0D;
+		}
+		if (priceOut != null) {
+			amountAfterTax = (priceOut * quantity)
+					* (1 + (tax / 100) - (discount / 100));
+		}
+		return amountAfterTax;
+	}
+
+	public void setAmountAfterTax(Double amountAfterTax) {
+		this.amountAfterTax = amountAfterTax;
+	}
+
+	private Double totalPrice;
+
+	@Transient
+	public Double getTotalPrice() {
+		if (totalPrice == null || totalPrice <= 0) {
+			totalPrice = 0D;
+		}
+		return totalPrice;
+	}
+
+	public void setTotalPrice(Double totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+
+	private Double amountBeforeTax;
+	private Double amountVat;
+
+	@Transient
+	public Double getAmountBeforeTax() {
+		if (amountBeforeTax == null || amountBeforeTax <= 0) {
+			amountBeforeTax = 0D;
+		}
+		return amountBeforeTax;
+	}
+
+	public void setAmountBeforeTax(Double amountBeforeTax) {
+		this.amountBeforeTax = amountBeforeTax;
+	}
+
+	@Transient
+	public Double getAmountVat() {
+		if (amountVat == null || amountVat <= 0) {
+			amountVat = 0D;
+		}
+		return amountVat;
+	}
+
+	public void setAmountVat(Double amountVat) {
+		this.amountVat = amountVat;
+	}
+
+	private Double quantity;
+
+	@Transient
+	public Double getQuantity() {
+		if (quantity == null || quantity <= 0) {
+			quantity = 1D;
+			caculateAmount();
+		}
+		return quantity;
+	}
+
+	public void setQuantity(Double quantity) {
+		this.quantity = quantity;
+	}
+
+	private Double sumQuantity;
+
+	@Transient
+	public Double getSumQuantity() {
+		return sumQuantity;
+	}
+
+	public void setSumQuantity(Double sumQuantity) {
+		this.sumQuantity = sumQuantity;
+	}
+
+	private Double discount;
+
+	@Column(name = "DISCOUNT")
+	public Double getDiscount() {
+		if (discount == null || discount <= 0) {
+			discount = 0D;
+			caculateAmount();
+		}
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+
+	private Double discountAmount;
+	private Double discountAmountInput;
+	private Double amountBeforeTaxInput;
+	private Double amountVatInput;
+	private Double totalAmountInput;
+
+	@Transient
+	public Double getDiscountAmountInput() {
+		return discountAmountInput;
+	}
+
+	public void setDiscountAmountInput(Double discountAmountInput) {
+		this.discountAmountInput = discountAmountInput;
+	}
+
+	@Transient
+	public Double getAmountBeforeTaxInput() {
+		return amountBeforeTaxInput;
+	}
+
+	public void setAmountBeforeTaxInput(Double amountBeforeTaxInput) {
+		this.amountBeforeTaxInput = amountBeforeTaxInput;
+	}
+
+	@Transient
+	public Double getAmountVatInput() {
+		return amountVatInput;
+	}
+
+	public void setAmountVatInput(Double amountVatInput) {
+		this.amountVatInput = amountVatInput;
+	}
+
+	@Transient
+	public Double getTotalAmountInput() {
+		return totalAmountInput;
+	}
+
+	public void setTotalAmountInput(Double totalAmountInput) {
+		this.totalAmountInput = totalAmountInput;
+	}
+
+	@Column(name = "DISCOUNT_AMOUNT")
+	public Double getDiscountAmount() {
+		return discountAmount;
+	}
+
+	public void setDiscountAmount(Double discountAmount) {
+		this.discountAmount = discountAmount;
+	}
+
+	public void caculateAmount() {
+		discountAmount = 0.0;
+		discountAmountInput = 0D;
+		if (quantity == null) {
+			quantity = 1D;
+		}
+		if (getPriceOut() == null) {
+			priceOut = 0D;
+		}
+		if (getPriceIn() == null) {
+			priceIn = 0D;
+		}
+		if (tax == null) {
+			tax = 0D;
+		}
+		if (discount != null) {
+			discountAmount = (quantity * priceOut) * (discount / 100);
+			discountAmountInput = (quantity * priceIn) * (discount / 100);
+		}
+		if (quantity != null) {
+			// if (amountBeforeTax == null || amountBeforeTax == 0) {
+			amountBeforeTax = (quantity * priceOut);
+			// } - discountAmount
+			amountVat = (amountBeforeTax - discountAmount) * (tax / 100);
+			amountBeforeTaxInput = (quantity * priceIn);
+			// - discountAmountInput
+			amountVatInput = (amountBeforeTaxInput - discountAmountInput)
+					* (tax / 100);
+		}
+		setAmountVat(amountVat);
+		totalPrice = this.amountBeforeTax + this.amountVat;
+		totalAmountInput = this.amountBeforeTaxInput + this.amountVatInput;
+	}
+
+	private Integer productQuoteId;
+	private Integer ProductOrderInputId;
+	private Integer ProductOrderOutputId;
+	private Integer productForecastId;
+
+	@Transient
+	public Integer getProductOrderInputId() {
+		return ProductOrderInputId;
+	}
+
+	public void setProductOrderInputId(Integer productOrderInputId) {
+		ProductOrderInputId = productOrderInputId;
+	}
+
+	@Transient
+	public Integer getProductOrderOutputId() {
+		return ProductOrderOutputId;
+	}
+
+	public void setProductOrderOutputId(Integer productOrderOutputId) {
+		ProductOrderOutputId = productOrderOutputId;
+	}
+
+	@Transient
+	public Integer getProductQuoteId() {
+		return productQuoteId;
+	}
+
+	public void setProductQuoteId(Integer productQuoteId) {
+		this.productQuoteId = productQuoteId;
+	}
+
+	private Integer productContractId;
+
+	@Transient
+	public Integer getProductContractId() {
+		return productContractId;
+	}
+
+	public void setProductContractId(Integer productContractId) {
+		this.productContractId = productContractId;
+	}
+
+	private Integer productPurchaseContractId;
+
+	@Transient
+	public Integer getProductPurchaseContractId() {
+		return productPurchaseContractId;
+	}
+
+	public void setProductPurchaseContractId(Integer productPurchaseContractId) {
+		this.productPurchaseContractId = productPurchaseContractId;
+	}
+
+	@Transient
+	public Integer getProductForecastId() {
+		return productForecastId;
+	}
+
+	public void setProductForecastId(Integer productForecastId) {
+		this.productForecastId = productForecastId;
+	}
+
+	private String productQuantity;
+	private int categoryId;
+
+	@Transient
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	@Transient
+	public String getProductQuantity() {
+		return productQuantity;
+	}
+
+	public void setProductQuantity(String productQuantity) {
+		this.productQuantity = productQuantity;
+	}
+
+	@Column(name = "WARRANTY_TIME")
+	public String getWarrantyTime() {
+		return warrantyTime;
+	}
+
+	public void setWarrantyTime(String warrantyTime) {
+		this.warrantyTime = warrantyTime;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "products")
+	public Set<ProductContract> getProductContract() {
+		return productContract;
+	}
+
+	public void setProductContract(Set<ProductContract> productContract) {
+		this.productContract = productContract;
+	}
+
+	/**
+	 * @return the productComponent
+	 */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productComponent")
+	public Set<ProductComponents> getProductComponent() {
+		return productComponent;
+	}
+
+	/**
+	 * @param productComponent
+	 *            the productComponent to set
+	 */
+	public void setProductComponent(Set<ProductComponents> productComponent) {
+		this.productComponent = productComponent;
+	}
+
+	@Transient
+	public List<ProductComponents> getListProductComponent() {
+		return this.productComponent == null ? null
+				: new ArrayList<ProductComponents>(this.productComponent);
+	}
+
+	private List<ProductComponents> listProduct;
+
+	@Transient
+	public List<ProductComponents> getListProduct() {
+		listProduct = this.product == null ? null
+				: new ArrayList<ProductComponents>(this.product);
+		return listProduct;
+	}
+
+	public void setListProduct(List<ProductComponents> listProduct) {
+		this.listProduct = listProduct;
+	}
+
+	/**
+	 * @return the product
+	 */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+	public Set<ProductComponents> getProduct() {
+		return product;
+	}
+
+	/**
+	 * @param product
+	 *            the product to set
+	 */
+	public void setProduct(Set<ProductComponents> product) {
+		this.product = product;
+	}
+
+	private Double productAmountConvert;
+	private Double productPriceConvert;
+
+	@Column(name = "PRODUCT_AMOUNT_CONVERT")
+	public Double getProductAmountConvert() {
+		return productAmountConvert;
+	}
+
+	public void setProductAmountConvert(Double productAmountConvert) {
+		this.productAmountConvert = productAmountConvert;
+	}
+
+	@Transient
+	public Double getProductPriceConvert() {
+		return productPriceConvert;
+	}
+
+	public void setProductPriceConvert(Double productPriceConvert) {
+		this.productPriceConvert = productPriceConvert;
+	}
+
+	@Transient
+	public String getPriceOutString() {
+		try{
+			Locale locale = (Locale) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("localeSession");
+			DecimalFormat numberFormat = (DecimalFormat) NumberFormat.getInstance(locale);
+			if (this.getPriceOut() != null) {
+				priceOutString = numberFormat.format(this.getPriceOut());
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return priceOutString;
+	}
+
+	public void setPriceOutString(String priceOutString) {
+		this.priceOutString = priceOutString;
+	}
+
+	@Transient
+	public String getPriceInString() {
+		try{
+			Locale locale = (Locale) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("localeSession");
+			DecimalFormat numberFormat = (DecimalFormat) NumberFormat.getInstance(locale);
+			if (this.getPriceIn() != null) {
+				priceInString = numberFormat.format(this.getPriceIn());
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return priceInString;
+	}
+
+	public void setPriceInString(String priceInString) {
+		this.priceInString = priceInString;
+	}
+
+	// luu tam so luong hang hoa khi tao phieu nhap
+	private double oldQuantity;
+
+	@Transient
+	public double getOldQuantity() {
+		return oldQuantity;
+	}
+
+	public void setOldQuantity(double oldQuantity) {
+		this.oldQuantity = oldQuantity;
+	}
+
+	private int oldWarehouseId;
+
+	@Transient
+	public int getOldWarehouseId() {
+		return oldWarehouseId;
+	}
+
+	public void setOldWarehouseId(int oldWarehouseId) {
+		this.oldWarehouseId = oldWarehouseId;
+	}
+
+	/**
+	 * @return the outOfStock
+	 */
+	@Column(name = "OUT_OF_STOCK")
+	public Double getOutOfStock() {
+		return outOfStock;
+	}
+
+	/**
+	 * @param outOfStock
+	 *            the outOfStock to set
+	 */
+	public void setOutOfStock(Double outOfStock) {
+		this.outOfStock = outOfStock;
+	}
+
+	private Double realPrice;
+	private Double totalAmount;
+	private Double realPriceInput;
+	private Double productPriceConvertInput;
+	private Double productAmountConvertInput;
+
+	@Transient
+	public Double getRealPrice() {
+		return realPrice;
+	}
+
+	public void setRealPrice(Double realPrice) {
+		this.realPrice = realPrice;
+	}
+
+	@Transient
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	@Transient
+	public Double getRealPriceInput() {
+		return realPriceInput;
+	}
+
+	public void setRealPriceInput(Double realPriceInput) {
+		this.realPriceInput = realPriceInput;
+	}
+
+	@Transient
+	public Double getProductPriceConvertInput() {
+		return productPriceConvertInput;
+	}
+
+	public void setProductPriceConvertInput(Double productPriceConvertInput) {
+		this.productPriceConvertInput = productPriceConvertInput;
+	}
+
+	@Transient
+	public Double getProductAmountConvertInput() {
+		return productAmountConvertInput;
+	}
+
+	public void setProductAmountConvertInput(Double productAmountConvertInput) {
+		this.productAmountConvertInput = productAmountConvertInput;
+	}
+
+	@Column(name = "WIDTH")
+	public Double getWidth() {
+		return width;
+	}
+
+	public void setWidth(Double width) {
+		this.width = width;
+	}
+
+	@Column(name = "HEIGHT")
+	public Double getHeight() {
+		return height;
+	}
+
+	public void setHeight(Double height) {
+		this.height = height;
+	}
+
+	@Column(name = "LENGTH")
+	public Double getLength() {
+		return length;
+	}
+
+	public void setLength(Double length) {
+		this.length = length;
+	}
+
+	@Transient
+	public Double getOldPriceIn() {
+		return oldPriceIn;
+	}
+
+	public void setOldPriceIn(Double oldPriceIn) {
+		this.oldPriceIn = oldPriceIn;
+	}
+
+	@Transient
+	public Double getOldPriceOut() {
+		return oldPriceOut;
+	}
+
+	public void setOldPriceOut(Double oldPriceOut) {
+		this.oldPriceOut = oldPriceOut;
+	}
+
+	@Column(name = "URL_IMAGE", length = 65535)
+	@Length(max = 65535)
+	public String getUrlImage() {
+		return urlImage;
+	}
+
+	public void setUrlImage(String urlImage) {
+		this.urlImage = urlImage;
+	}
+
+	public ProductObjects convertToProductObject() {
+		ProductObjects productObjects = new ProductObjects();
+
+		productObjects.setProductId(productId);
+		productObjects.setProductCode(productCode);
+		productObjects.setProductName(productName);
+		productObjects.setLength(length);
+		productObjects.setProductUnit(productUnit);
+		productObjects.setHeight(height);
+		productObjects.setWidth(width);
+		productObjects.setDescription(description);
+		productObjects.setProductImage(productImage);
+		productObjects.setPriceIn(priceIn);
+		productObjects.setOldPriceIn(oldPriceIn);
+		productObjects.setPriceOut(priceOut);
+		productObjects.setPriceOrigin(priceOut);
+		productObjects.setOldPriceOut(oldPriceOut);
+		productObjects.setPriceInString(priceInString);
+		productObjects.setPriceOutString(priceOutString);
+		productObjects.setWarrantyTime(warrantyTime);
+		productObjects.setProductCogs(productCogs);
+		productObjects.setProductOrigin(productOrigin);
+		productObjects.setProductManufactory(productManufactory);
+		productObjects.setSerial(serial);
+		// productObjects.setInventory(inventory);
+		// productObjects.setBook(book);
+		// productObjects.setWarehouse(warehouse);
+		// productObjects.setWarehouseName(warehouseName);
+		productObjects.setCategoryName(productCategory);
+		// productObjects.setCategoryId(categoryId);
+		productObjects.setSelected(selected);
+		// productObjects.setProductObjectId(productObjectId);
+		productObjects.setTax(tax);
+		productObjects.setDiscount(discount);
+		productObjects.setQuantity(quantity);
+		// productObjects.setReQuantity(reQuantity);
+		// productObjects.setWarehouseId(warehouseId);
+		//		
+		// productObjects.setRealPriceInput(realPriceInput);
+		productObjects.setDiscountAmountInput(discountAmountInput);
+		productObjects.setAmountBeforeTaxInput(amountBeforeTaxInput);
+		productObjects.setAmountVatInput(amountVatInput);
+		productObjects.setTotalAmountInput(totalAmountInput);
+		// productObjects.setProductAmountConvertInput(productAmountConvertInput);
+		// productObjects.setProductPriceConvertInput(productPriceConvertInput);
+
+		productObjects.setOldQuantity(oldQuantity);
+		productObjects.setOldWarehouseId(oldWarehouseId);
+		// productObjects.setRealPrice(realPrice);
+		// productObjects.setTotalAmount(totalAmount);
+		productObjects.setAmountBeforeTax(amountBeforeTax);
+		productObjects.setAmountVat(amountVat);
+		productObjects.setDiscountAmount(discountAmount);
+		productObjects.setProductAmountConvert(productAmountConvert);
+		productObjects.setProductPriceConvert(productPriceConvert);
+		productObjects.setProductNameText(productNameText);
+		productObjects.setFormula(formula); //cong thuc tinh khoi luong
+		productObjects.setFormulaDescription(formulaDescription); //mo ta cong thuc 
+    	productObjects.setUnitId(unitId); //don vi chinh
+    	productObjects.setFactorRevenue(factorRevenue);
+		return productObjects;
+	}
+
+	public void caculateAmount(Double exchangeRate) {
+		if (quantity == null) {
+			quantity = 1D;
+		}
+		if (priceIn == null) {
+			priceIn = 0D;
+		}
+		if (priceOut == null) {
+			priceOut = 0D;
+		}
+		if (tax == null) {
+			tax = 0D;
+		}
+		if (discount == null) {
+			discount = 0D;
+		}
+		if (exchangeRate == null || exchangeRate == 0D) {
+			exchangeRate = 1D;
+		}
+
+		realPrice = priceOut * (1 - discount / 100);
+		amountBeforeTax = quantity * priceOut;
+		discountAmount = (quantity * priceOut) * (discount / 100);
+		amountVat = quantity * realPrice * (tax / 100);
+		totalAmount = amountBeforeTax + amountVat - discountAmount;
+		productPriceConvert = priceOut * exchangeRate;
+		productAmountConvert = amountBeforeTax * exchangeRate;
+
+		realPriceInput = priceIn * (1 - discount / 100);
+		discountAmountInput = (quantity * priceIn) * (discount / 100);
+		amountBeforeTaxInput = (quantity * priceIn);
+		amountVatInput = quantity * realPriceInput * (tax / 100);
+		totalAmountInput = amountBeforeTaxInput + amountVatInput
+				- discountAmountInput;
+		productPriceConvertInput = priceIn * exchangeRate;
+		productAmountConvertInput = amountBeforeTaxInput * exchangeRate;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+
+	public void setProductBill(Set<ProductTblBills> productBill) {
+		this.productBill = productBill;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "products")
+	public Set<ProductTblBills> getProductBill() {
+		return productBill;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "products")
+	public Set<ProductWarehouseProduct> getProductsWarehouseProduct() {
+		return productsWarehouseProduct;
+	}
+
+	public void setProductsWarehouseProduct(
+			Set<ProductWarehouseProduct> productsWarehouseProduct) {
+		this.productsWarehouseProduct = productsWarehouseProduct;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "customersLevelProductId.products", cascade = CascadeType.ALL)
+	public Set<CustomersLevelProduct> getCustomersLevelProduct() {
+		return customersLevelProduct;
+	}
+
+	public void setCustomersLevelProduct(
+			Set<CustomersLevelProduct> customersLevelProduct) {
+		this.customersLevelProduct = customersLevelProduct;
+	}
+
+	public void addCustomersLevelProduct(
+			CustomersLevelProduct customersLevelProduct) {
+		this.customersLevelProduct.add(customersLevelProduct);
+	}
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "products")
+	public Set<FilesProducts> getFilesProducts() {
+		return filesProducts;
+	}
+
+	public void setFilesProducts(Set<FilesProducts> filesProducts) {
+		this.filesProducts = filesProducts;
+	}
+
+	public void setExpiryDate(Date expiryDate) {
+		this.expiryDate = expiryDate;
+	}
+
+	@Column(name="EXPIRY_DATE")
+	public Date getExpiryDate() {
+		return expiryDate;
+	}
+	
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "products")
+	public Set<ProductUnit> getProductUnits() {
+		return productUnits;
+	}
+
+	public void setProductUnits(Set<ProductUnit> productUnits) {
+		this.productUnits = productUnits;
+	}
+	
+	@Column(name="UNIT_ID")
+	public Integer getUnitId() {
+		return unitId;
+	}
+
+	public void setUnitId(Integer unitId) {
+		this.unitId = unitId;
+	}
+	
+	@Column(name="FORMULA")
+	public String getFormula() {
+		return formula;
+	}
+
+	public void setFormula(String formula) {
+		this.formula = formula;
+	}
+	
+	@Column(name="FORMULA_DESCRIPTION")
+	public String getFormulaDescription() {
+		return formulaDescription;
+	}
+
+	public void setFormulaDescription(String formulaDescription) {
+		this.formulaDescription = formulaDescription;
+	}
+	
+	@Column(name = "FACTOR_REVENUE")
+	public Double getFactorRevenue() {
+		return factorRevenue;
+	}
+
+	public void setFactorRevenue(Double factorRevenue) {
+		this.factorRevenue = factorRevenue;
+	}
+	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "products")
+	public Set<AttributeValue> getAttributeValues() {
+		return attributeValues;
+	}
+
+	public void setAttributeValues(Set<AttributeValue> attributeValues) {
+		this.attributeValues = attributeValues;
+	}
+	@Transient
+	public Map<Integer, String> getCustomFields() {
+		return customFields;
+	}
+
+	public void setCustomFields(Map<Integer, String> customFields) {
+		this.customFields = customFields;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "products")
+	public Set<ProductForecast> getProductForecast() {
+		return productForecast;
+	}
+
+	public void setProductForecast(Set<ProductForecast> productForecast) {
+		this.productForecast = productForecast;
+	}
+}

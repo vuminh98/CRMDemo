@@ -1,0 +1,120 @@
+package Database.DatabaseDemo;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.URL;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+
+
+public class GetValueFromDB implements RequestHandler<String, String> {
+	
+	public static void main(String[] args) {
+		
+	}
+
+	private static Connection accountConnection; 
+	private static Connection systemConnection; 
+	public static Map<String, Connection> connectionMap = new HashMap<>();
+    public static Map<String, String> accountDbInfo = new HashMap<>(); 
+	
+    // Load when first time class loaded. Keep client connection alive. 
+    // RDS Proxy guarantee no client using same database connection
+    static {
+    	systemConnection = DatabaseUtil.systemConnection;
+    	connectionMap = DatabaseUtil.connectionMap;
+    }
+    
+    public String handleRequest(String accountId, Context context) {
+    	LambdaLogger logger = context.getLogger();
+    	logger.log("Lambda start");
+    	
+    	
+    	logger.log("Time start: " + context.getRemainingTimeInMillis());
+    	logger.log("Received event: " + accountId);
+    	logger.log("System connection:" + systemConnection.toString());
+    	String result = "";
+		try {
+			if(DatabaseUtil.checkAccountConnection(accountId, systemConnection, connectionMap) != null) {
+				accountConnection = DatabaseUtil.checkAccountConnection(accountId, systemConnection, connectionMap);
+			}
+			else {
+				try  {
+					accountConnection= DatabaseUtil.setAccountConnection(accountId, systemConnection);
+				} catch (SQLException e1) {
+					logger.log("Error sql: " + accountId);
+					e1.printStackTrace();
+				} catch (Exception e) {
+					
+					logger.log("No connection found for accountId: " + accountId);
+				}
+			}
+		} catch (SQLException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+		
+		logger.log("account connection:" + accountConnection.toString());		 	
+        logger.log("Time after open connection: " + context.getRemainingTimeInMillis());
+//            Statement stmt = conn.createStatement();
+//            String sql = "SELECT * FROM sys_accounts LIMIT 1000";
+//            String sql = "SELECT * FROM sys_account_users WHERE ACCOUNT_ID = ?";
+//            
+//            PreparedStatement stmt = conn.prepareStatement(sql); 
+//
+//            stmt.setString(1, input);
+//            ResultSet rs = stmt.executeQuery(sql);
+//            while(rs.next()) {
+//                String value = rs.getString("account_id");
+//                result += value + "\n";
+//                logger.log(result);
+//            }
+        try {
+        	CallableStatement stmt = accountConnection.prepareCall("{CALL lead_count(?, ?, NULL, NULL, NULL, NULL, 'is', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)}");
+            stmt.setString(1, "4c8f61da-d34d-11e8-b01f-063a55cd790e");
+            stmt.setString(2, "0eca2696-d352-11e8-b01f-063a55cd790e");
+            ResultSet rs = stmt.executeQuery();
+            
+            logger.log("Time after execute querry: " + context.getRemainingTimeInMillis());
+            
+            ResultSetMetaData metadata = rs.getMetaData();
+            int numColumns = metadata.getColumnCount();
+
+            while (rs.next()) {
+                for (int i = 1; i <= numColumns; i++) {
+                    Object columnValue = rs.getObject(i);
+                    logger.log(metadata.getColumnName(i) + ": " + columnValue +"\n");
+                }
+                logger.log("---------------------------\n");
+            } 
+            rs.close();
+            stmt.close();
+//          Don't close to keep connection alive
+//          accountConnection.close();
+        
+        } catch (Exception e) {
+			e.printStackTrace();
+		}
+        return result;
+    }
+		
+}

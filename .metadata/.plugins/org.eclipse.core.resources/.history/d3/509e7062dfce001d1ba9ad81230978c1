@@ -1,0 +1,19 @@
+package demo.lambda1;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+/**
+ * 
+ * Hello world!
+ *
+ */
+public class WelcomeLambda implements RequestHandler<String, Object> {
+
+	public Object handleRequest(String input, Context context) {
+	System.out.println("Hello World" + input);
+	return input;
+
+	}
+    
+}

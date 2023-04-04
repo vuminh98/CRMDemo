@@ -1,0 +1,53 @@
+package Database.DatabaseDemo;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.URL;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+
+
+public class GetValueFromDB implements RequestHandler<String, String> {
+	
+	private static String DB_URL = "jdbc:mariadb://crmviet.c09wjkmeasrs.ap-southeast-1.rds.amazonaws.com/crmviet_sharding";
+    private static String USER_NAME = "crmviet";
+    private static String PASSWORD = "altalab123";
+    
+	public String handleRequest(String input, Context context) {
+        try {
+        	Connection connection = setConnection(DB_URL, USER_NAME, PASSWORD);
+        	System.out.println("flag" + connection);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+		return "abc";
+	}
+	
+	private static Connection setConnection (String url, String user, String pass) throws Exception {
+		 Class.forName("org.mariadb.jdbc.Driver");
+		 try {
+		 Connection connection = DriverManager.getConnection(url, user, pass);
+		 return connection;
+		 } catch (SQLException e) {
+		 e.printStackTrace();
+		 }
+		 return null;
+		 }
+		
+}
