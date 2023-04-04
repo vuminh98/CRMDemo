@@ -62,7 +62,7 @@ public class AddQuote implements RequestHandler<String, String> {
 					System.out.println(dbAccount);
 					connection = setConnection(ACCOUNT_DB_URL_PREFIX + dbAccount, ACCOUNT_DB_USERNAME,ACCOUNT_DB_PASSWORD);
 					Statement statement2 = connection.createStatement();
-					ResultSet resultSet = statement2.executeQuery("DELETE FROM crm_quote where account_id = '" + input + "'");
+					ResultSet resultSet = statement2.executeQuery("DELETE FROM crm_quote where account_id= '" + input + "'");
 					System.out.println("DELETE SUCCESSFULLY!");
 				}
 			}
@@ -73,12 +73,12 @@ public class AddQuote implements RequestHandler<String, String> {
 	}
 	
 
-//	public String update(String input1, String a) throws UnsupportedEncodingException {
-//		String SQLADD = "UPDATE crm_email_list set EMAIL_LIST_NAME = '" + input1.getBytes("EMAIL_LIST_NAME").toString()
-//				+ "'," + "EMAILS ='" + input1.getBytes("EMAILS").toString() + "'," + "NOTE='"
-//				+ input1.getBytes("NOTE").toString() + "'" + "where ACCOUNT_ID='" + a + "'";
-//		return SQLADD;
-//	}
+	public String update(String input1, String a) throws UnsupportedEncodingException {
+		String SQLADD = "UPDATE crm_email_list set EMAIL_LIST_NAME = '" + input1.getBytes("EMAIL_LIST_NAME").toString()
+				+ "'," + "EMAILS ='" + input1.getBytes("EMAILS").toString() + "'," + "NOTE='"
+				+ input1.getBytes("NOTE").toString() + "'" + "where ACCOUNT_ID='" + a + "'";
+		return SQLADD;
+	}
 
 //	@Override
 //	public String handleRequest(String jsonString, Context context) {

@@ -62,7 +62,7 @@ public class AddQuote implements RequestHandler<String, String> {
 					System.out.println(dbAccount);
 					connection = setConnection(ACCOUNT_DB_URL_PREFIX + dbAccount, ACCOUNT_DB_USERNAME,ACCOUNT_DB_PASSWORD);
 					Statement statement2 = connection.createStatement();
-					ResultSet resultSet = statement2.executeQuery("DELETE FROM crm_quote where account_id = '" + input + "'");
+					ResultSet resultSet = statement2.executeQuery("DELETE FROM crm_quote where account_id= '" + input + "'");
 					System.out.println("DELETE SUCCESSFULLY!");
 				}
 			}
