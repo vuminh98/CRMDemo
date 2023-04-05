@@ -2,8 +2,9 @@
 <section name="Workbench">
 	<section name="MavenProjectWizardLocationPage">
 		<list key="location">
-			<item value="C:\working\workspace_project_test\lambda1"/>
+			<item value="C:\working\workspace_project_test\quotes"/>
 			<item value="C:\Users\pc\Desktop\Wizard\altacrm\altacrm"/>
+			<item value="C:\working\workspace_project_test\lambda1"/>
 			<item value="C:\working\workspace_project_test\GetValue"/>
 			<item value="C:\working\workspace_project_test\GetValue\src\main\java\Database\GetValue\GetValue.java"/>
 			<item value="C:\Users\pc\Desktop\Wizard\altacrm\altacrm\src\main\altalab\altacrm\modeltest\HelloWorld.java"/>
@@ -30,6 +31,9 @@
 	</section>
 	<section name="Maven2ProjectWizardArchifactPage">
 		<list key="package">
+			<item value="Database.ReflectionDemo"/>
+			<item value="Database.GenericTest"/>
+			<item value="Database.demotest"/>
 			<item value="Database.quotes"/>
 			<item value="Database.quote"/>
 			<item value="Database"/>
@@ -41,6 +45,9 @@
 			<item value="Database"/>
 		</list>
 		<list key="artifactId">
+			<item value="ReflectionDemo"/>
+			<item value="GenericTest"/>
+			<item value="demotest"/>
 			<item value="quotes"/>
 			<item value="quote"/>
 			<item value="bc"/>

@@ -2,3 +2,5 @@
 1680578403671	Delete element
 1680587566690	Rename type 'getOwnerFromAccount'
 1680598442085	Rename resource 'DeleteAccount.java'
+1680658188510	Rename resource 'AddQuote.java'
+1680658205632	Rename resource 'UpdateQuote.java'
