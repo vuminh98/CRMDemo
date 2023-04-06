@@ -33,5 +33,8 @@ public class Main {
         //setAccessible: thiết lập quyền truy cập của 1 trường, phương thức
         color.set(car, "blue");
         System.out.println(car); //Car [name=Porsche, quantity=2, color=blue, isAvaiable=true]
+        
+        
+        //asdjasjhdjkaskjdhjashjdhasjkhjkdhajhdjahjskdhjkashjkdhjkashjkdhkashdkashkjdhkasjhdjkhkasd
     }
 }

@@ -5048,3 +5048,8 @@ Caused by: org.codehaus.plexus.util.xml.pull.XmlPullParserException: end tag not
 2023-04-06 11:36:15,754 [Worker-33: Building workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\working\workspace_project_test\ReflectionDemo\src\test\resources
 2023-04-06 12:00:15,477 [Worker-46: Building workspace] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
 2023-04-06 12:00:15,478 [Worker-46: Building workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\working\workspace_project_test\ReflectionDemo\src\main\resources
+2023-04-06 12:00:15,479 [Worker-46: Building workspace] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+2023-04-06 12:00:15,480 [Worker-46: Building workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\working\workspace_project_test\ReflectionDemo\src\test\resources
+2023-04-06 13:49:42,354 [Worker-39: Building workspace] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+2023-04-06 13:49:42,354 [Worker-39: Building workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\working\workspace_project_test\ReflectionDemo\src\main\resources
+2023-04-06 13:49:42,354 [Worker-39: Building workspace] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
